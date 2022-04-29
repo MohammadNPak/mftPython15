@@ -1,6 +1,6 @@
 
 import json
-
+import csv
 students = []
 while True:
     command= input("command: ")
@@ -49,11 +49,40 @@ while True:
         mean: {sum(student['grades'])/len(student['grades'])}""")
     
     elif command == "save":
-        f = open("data.txt","w")
-        for student in students:
-            f.write(f"{student['name']},{student['last_name']},{student['age']},{' '.join(map(str,student['grades']))}\n")
-        f.close()
+        with open("data.txt","w") as f:
+            for student in students:
+                f.write(f"{student['name']},{student['last_name']},{student['age']},{' '.join(map(str,student['grades']))}\n")
+
     elif command == "load":
-        f = open("data.txt","r")
-        for line in f.readlines():
-            pass
+        students = []
+        with open("data.txt","r") as f:
+            for line in f.readlines():
+                d = line.strip().split(",")
+                student = { "name":d[0],
+                        "last_name":d[1],
+                        "age":int(d[2]),
+                        "grades": [float(x) for x in d[3].split()]}
+                students.append(student)
+
+
+
+    elif command == "save_csv":
+        if students:
+            with  open("data.csv","w") as f:
+                f.write(",".join(students[0].keys())+'\n')
+                for student in students:
+                    f.write(f"{student['name']},{student['last_name']},{student['age']},{' '.join(map(str,student['grades']))}\n")
+                
+
+    elif command == "load_csv":
+        students = []
+        with open("data.csv","r") as f:
+            reader = csv.reader(f)
+            next(reader)
+            for line in reader:
+                student = { "name":line[0],
+                        "last_name":line[1],
+                        "age":int(line[2]),
+                        "grades": [float(x) for x in line[3].split()]}
+
+                students.append(student)
